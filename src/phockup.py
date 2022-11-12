@@ -344,27 +344,36 @@ but looking for '{self.file_type}'"
         Process xmp files. These are meta data for RAW images
         """
         xmp_original_with_ext = original_filename + '.xmp'
-        xmp_original_without_ext = os.path.splitext(original_filename)[0] + '.xmp'
+        xmp_original_without_ext = os.path.splitext(original_filename)[0] + '.json'
+        json_original_with_ext = original_filename + '.xmp'
+        json_original_without_ext = os.path.splitext(original_filename)[0] + '.json'
 
         suffix = f'-{suffix}' if suffix > 1 else ''
 
-        xmp_files = {}
+        meta_files = {}
 
         if os.path.isfile(xmp_original_with_ext):
             xmp_target = f'{file_name}{suffix}.xmp'
-            xmp_files[xmp_original_with_ext] = xmp_target
+            meta_files[xmp_original_with_ext] = xmp_target
         if os.path.isfile(xmp_original_without_ext):
             xmp_target = f'{(os.path.splitext(file_name)[0])}{suffix}.xmp'
-            xmp_files[xmp_original_without_ext] = xmp_target
+            meta_files[xmp_original_without_ext] = xmp_target
 
-        for original, target in xmp_files.items():
-            xmp_path = os.path.sep.join([output, target])
-            logger.info(f'{original} => {xmp_path}')
+        if os.path.isfile(json_original_with_ext):
+            json_target = f'{file_name}{suffix}.json'
+            meta_files[json_original_with_ext] = json_target
+        if os.path.isfile(json_original_without_ext):
+            json_target = f'{(os.path.splitext(file_name)[0])}{suffix}.json'
+            meta_files[json_original_without_ext] = json_target
+
+        for original, target in meta_files.items():
+            meta_path = os.path.sep.join([output, target])
+            logger.info(f'{original} => {meta_path}')
 
             if not self.dry_run:
                 if self.move:
-                    shutil.move(original, xmp_path)
+                    shutil.move(original, meta_path)
                 elif self.link:
-                    os.link(original, xmp_path)
+                    os.link(original, meta_path)
                 else:
-                    shutil.copy2(original, xmp_path)
+                    shutil.copy2(original, meta_path)
