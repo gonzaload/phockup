@@ -192,34 +192,44 @@ def test_process_image_exif_date(mocker):
     shutil.rmtree('output', ignore_errors=True)
 
 
-def test_process_image_xmp(mocker):
+def test_process_image_meta(mocker):
     shutil.rmtree('output', ignore_errors=True)
     mocker.patch.object(Phockup, 'check_directories')
     mocker.patch.object(Phockup, 'walk_directory')
     Phockup('input', 'output').process_file("input/xmp.jpg")
+    Phockup('input', 'output').process_file("input/json.jpg")
     assert os.path.isfile("output/2017/01/01/20170101-010101.jpg")
     assert os.path.isfile("output/2017/01/01/20170101-010101.jpg.xmp")
+    assert os.path.isfile("output/2017/01/01/20170101-010101-2.jpg")
+    assert os.path.isfile("output/2017/01/01/20170101-010101-2.jpg.json")
     shutil.rmtree('output', ignore_errors=True)
 
 
-def test_process_image_xmp_noext(mocker):
+def test_process_image_meta_noext(mocker):
     shutil.rmtree('output', ignore_errors=True)
     mocker.patch.object(Phockup, 'check_directories')
     mocker.patch.object(Phockup, 'walk_directory')
     Phockup('input', 'output').process_file("input/xmp_noext.jpg")
+    Phockup('input', 'output').process_file("input/json_noext.jpg")
     assert os.path.isfile("output/2017/01/01/20170101-010101.jpg")
     assert os.path.isfile("output/2017/01/01/20170101-010101.xmp")
+    assert os.path.isfile("output/2017/01/01/20170101-010101-2.jpg")
+    assert os.path.isfile("output/2017/01/01/20170101-010101-2.json")
     shutil.rmtree('output', ignore_errors=True)
 
 
-def test_process_image_xmp_ext_and_noext(mocker):
+def test_process_image_meta_ext_and_noext(mocker):
     shutil.rmtree('output', ignore_errors=True)
     mocker.patch.object(Phockup, 'check_directories')
     mocker.patch.object(Phockup, 'walk_directory')
     Phockup('input', 'output').process_file("input/xmp_ext.jpg")
+    Phockup('input', 'output').process_file("input/json_ext.jpg")
     assert os.path.isfile("output/2017/01/01/20170101-010101.jpg")
     assert os.path.isfile("output/2017/01/01/20170101-010101.xmp")
     assert os.path.isfile("output/2017/01/01/20170101-010101.jpg.xmp")
+    assert os.path.isfile("output/2017/01/01/20170101-010101-2.jpg")
+    assert os.path.isfile("output/2017/01/01/20170101-010101-2.json")
+    assert os.path.isfile("output/2017/01/01/20170101-010101-2.jpg.json")
     shutil.rmtree('output', ignore_errors=True)
 
 
@@ -256,12 +266,20 @@ def test_process_move(mocker):
     phockup = Phockup('input', 'output', move=True)
     open("input/tmp_20170101_010101.jpg", "w").close()
     open("input/tmp_20170101_010101.xmp", "w").close()
+    open("input/tmp_20170101_010102.jpg", "w").close()
+    open("input/tmp_20170101_010102.json", "w").close()
     phockup.process_file("input/tmp_20170101_010101.jpg")
     phockup.process_file("input/tmp_20170101_010101.xmp")
+    phockup.process_file("input/tmp_20170101_010102.jpg")
+    phockup.process_file("input/tmp_20170101_010102.json")
     assert not os.path.isfile("input/tmp_20170101_010101.jpg")
     assert not os.path.isfile("input/tmp_20170101_010101.xmp")
+    assert not os.path.isfile("input/tmp_20170101_010102.jpg")
+    assert not os.path.isfile("input/tmp_20170101_010102.json")
     assert os.path.isfile("output/2017/01/01/20170101-010101.jpg")
     assert os.path.isfile("output/2017/01/01/20170101-010101.xmp")
+    assert os.path.isfile("output/2017/01/01/20170101-010102.jpg")
+    assert os.path.isfile("output/2017/01/01/20170101-010102.json")
     shutil.rmtree('output', ignore_errors=True)
 
 
@@ -276,15 +294,25 @@ def test_process_link(mocker):
     phockup = Phockup('input', 'output', link=True)
     open("input/tmp_20170101_010101.jpg", "w").close()
     open("input/tmp_20170101_010101.xmp", "w").close()
+    open("input/tmp_20170101_010102.jpg", "w").close()
+    open("input/tmp_20170101_010102.json", "w").close()
     phockup.process_file("input/tmp_20170101_010101.jpg")
     phockup.process_file("input/tmp_20170101_010101.xmp")
+    phockup.process_file("input/tmp_20170101_010102.jpg")
+    phockup.process_file("input/tmp_20170101_010102.json")
     assert os.path.isfile("input/tmp_20170101_010101.jpg")
     assert os.path.isfile("input/tmp_20170101_010101.xmp")
+    assert os.path.isfile("input/tmp_20170101_010102.jpg")
+    assert os.path.isfile("input/tmp_20170101_010102.json")
     assert os.path.isfile("output/2017/01/01/20170101-010101.jpg")
     assert os.path.isfile("output/2017/01/01/20170101-010101.xmp")
+    assert os.path.isfile("output/2017/01/01/20170101-010102.jpg")
+    assert os.path.isfile("output/2017/01/01/20170101-010102.json")
     shutil.rmtree('output', ignore_errors=True)
     os.remove("input/tmp_20170101_010101.jpg")
     os.remove("input/tmp_20170101_010101.xmp")
+    os.remove("input/tmp_20170101_010102.jpg")
+    os.remove("input/tmp_20170101_010102.json")
 
 
 def test_process_exists_same(mocker, caplog):
@@ -316,12 +344,13 @@ def test_process_same_date_different_files_rename(mocker):
     shutil.rmtree('output', ignore_errors=True)
 
 
-def test_process_skip_xmp(mocker):
-    # Assume no errors == skip XMP file
+def test_process_skip_meta(mocker):
+    # Assume no errors == skip XMP and JSON files
     mocker.patch.object(Phockup, 'check_directories')
     mocker.patch.object(Phockup, 'walk_directory')
     phockup = Phockup('input', 'output')
     phockup.process_file("skip.xmp")
+    phockup.process_file("skip.json")
 
 
 def test_process_skip_ignored_file():

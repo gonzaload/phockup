@@ -237,9 +237,9 @@ class Phockup():
     def process_file(self, filename):
         """
         Process the file using the selected strategy
-        If file is .xmp skip it so process_xmp method can handle it
+        If file is .xmp or json skip it so process_meta_files method can handle it
         """
-        if str.endswith(filename, '.xmp'):
+        if str.endswith(filename, ('.xmp', '.json')):
             return None
 
         progress = f'{filename}'
@@ -304,7 +304,7 @@ but looking for '{self.file_type}'"
                     self.pbar.write(progress)
                 logger.info(progress)
 
-                self.process_xmp(filename, target_file_name, suffix, output)
+                self.process_meta_files(filename, target_file_name, suffix, output)
                 break
 
             suffix += 1
@@ -339,13 +339,13 @@ but looking for '{self.file_type}'"
         target_file_path = os.path.sep.join([output, target_file_name])
         return output, target_file_name, target_file_path, target_file_type
 
-    def process_xmp(self, original_filename, file_name, suffix, output):
+    def process_meta_files(self, original_filename, file_name, suffix, output):
         """
-        Process xmp files. These are meta data for RAW images
+        Process xmp and json files. These are meta data for RAW images
         """
         xmp_original_with_ext = original_filename + '.xmp'
-        xmp_original_without_ext = os.path.splitext(original_filename)[0] + '.json'
-        json_original_with_ext = original_filename + '.xmp'
+        xmp_original_without_ext = os.path.splitext(original_filename)[0] + '.xmp'
+        json_original_with_ext = original_filename + '.json'
         json_original_without_ext = os.path.splitext(original_filename)[0] + '.json'
 
         suffix = f'-{suffix}' if suffix > 1 else ''
